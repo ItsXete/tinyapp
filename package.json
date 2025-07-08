@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/ItsXete/tinyapp/issues"
   },
-  "homepage": "https://github.com/ItsXete/tinyapp#readme"
+  "homepage": "https://github.com/ItsXete/tinyapp#readme",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
 }
