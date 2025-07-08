@@ -44,8 +44,19 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
-app.post("/urls/:id/delete", (req, res) => {
+app.post('/urls/:id/delete', (req, res) => {
   const id = req.params.id;
   delete urlDatabase[id];
-  res.redirect("/urls");
+  res.redirect('/urls'); 
+});
+
+app.post('/urls/:id', (req, res) => {
+  const id = req.params.id;
+  const newLongURL = req.body.longURL;
+
+  if (urlDatabase[id]) {
+    urlDatabase[id] = newLongURL;
+  }
+
+  res.redirect('/urls');
 });
