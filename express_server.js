@@ -23,17 +23,23 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
-app.get("/urls/:id", (req, res) => {
-  const templateVars = { id: req.params.id, longURL: longURL };
-  res.render("urls_show", templateVars);
+app.get("/u/:id", (req, res) => {
+  const id = req.params.id;
+  const longURL = urlDatabase[id];
+  if (longURL) {
+    res.redirect(longURL);
+  } else {
+    res.status(404).send("Short URL not found");
+  }
 });
 
 function generateRandomString() {
   return Math.random().toString(36).substring(2, 8);
 }
 
-app.post("/urls", (req, res) => {
-  const id = generateRandomString();
-  urlDatabase[id] = req.body.longURL;
-  res.redirect(`/urls/${id}`);
+app.get("/urls/:id", (req, res) => {
+  const id = req.params.id;
+  const longURL = urlDatabase[id];
+  const templateVars = { id, longURL };
+  res.render("urls_show", templateVars);
 });
