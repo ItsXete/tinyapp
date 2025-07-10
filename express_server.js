@@ -9,8 +9,10 @@ app.use(cookieParser());
 app.set("view engine", "ejs");
 
 const urlDatabase = {
-  b2xVn2: "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com",
+  b2xVn2: {
+    longURL: "http://www.lighthouselabs.ca",
+    userID: "userRandomID"
+  },
 };
 
 const getUserByEmail = (email, usersDB) => {
@@ -34,18 +36,23 @@ app.get("/urls/new", (req, res) => {
   const user_id = req.cookies.user_id;
   const user = users[user_id];
 
+  if (!user) {
+    return res.redirect("/login");
+  }
+
   const templateVars = { user };
   res.render("urls_new", templateVars);
 });
 
 app.get("/u/:id", (req, res) => {
-  const id = req.params.id;
-  const longURL = urlDatabase[id];
-  if (longURL) {
-    res.redirect(longURL);
-  } else {
-    res.status(404).send("Short URL not found");
+  const shortURL = req.params.id;
+
+  if (!urlDatabase[shortURL]) {
+    return res.status(404).send("<html><body><h2>URL not found</h2></body></html>");
   }
+
+  const longURL = urlDatabase[shortURL];
+  res.redirect(longURL);
 });
 
 function generateRandomString() {
@@ -110,6 +117,12 @@ app.post("/logout", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
+  const user_id = req.cookies.user_id;
+
+  if (users[user_id]) {
+    return res.redirect("/urls");
+  }
+
   res.render("register");
 });
 
@@ -165,4 +178,19 @@ app.post("/register", (req, res) => {
 
 app.get("/login", (req, res) => {
   res.render("login");
+});
+
+app.post("/urls", (req, res) => {
+  const user_id = req.cookies.user_id;
+  const user = users[user_id];
+
+  if (!user) {
+    return res.status(401).send("<html><body><h2>You must be logged in to shorten URLs.</h2></body></html>");
+  }
+
+  const shortURL = generateRandomString();
+  const longURL = req.body.longURL;
+  urlDatabase[shortURL] = longURL;
+
+  res.redirect(`/urls/${shortURL}`);
 });
