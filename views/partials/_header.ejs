@@ -1,11 +1,9 @@
-<% if (username) { %>
-  <span class="navbar-text text-white mr-3">Logged in as: <%= username %></span>
+<% if (user) { %>
+  <span class="navbar-text text-white mr-3">Logged in as: <%= user.email %></span>
   <form method="POST" action="/logout" class="form-inline" style="display:inline;">
     <button class="btn btn-light" type="submit">Logout</button>
   </form>
 <% } else { %>
-  <form method="POST" action="/login" class="form-inline">
-    <input class="form-control mr-2" type="text" name="username" placeholder="Username" required>
-    <button class="btn btn-light" type="submit">Login</button>
-  </form>
+  <a class="btn btn-light mr-2" href="/login">Login</a>
+  <a class="btn btn-light" href="/register">Register</a>
 <% } %>
