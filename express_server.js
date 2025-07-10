@@ -13,6 +13,15 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com",
 };
 
+const getUserByEmail = (email, usersDB) => {
+  for (const userId in usersDB) {
+    if (usersDB[userId].email === email) {
+      return usersDB[userId];
+    }
+  }
+  return null;
+};
+
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
@@ -115,11 +124,10 @@ app.post("/register", (req, res) => {
     return res.status(400).send("Email and password cannot be blank.");
   }
 
-  // Check if email already exists
-  for (const userId in users) {
-    if (users[userId].email === email) {
-      return res.status(400).send("A user with that email already exists.");
-    }
+  // Use helper to check if email already exists
+  const existingUser = getUserByEmail(email, users);
+  if (existingUser) {
+    return res.status(400).send("A user with that email already exists.");
   }
 
   // Generate a new user ID
@@ -137,7 +145,7 @@ app.post("/register", (req, res) => {
   // Set a cookie with the user's ID
   res.cookie("user_id", userID);
 
-  // Log users object to verify
+  // Debug log
   console.log("Updated users object:", users);
 
   // Redirect to /urls
