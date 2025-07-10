@@ -22,7 +22,11 @@ app.listen(PORT, () => {
 });
 
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  const user_id = req.cookies.user_id;
+  const user = users[user_id];
+
+  const templateVars = { user };
+  res.render("urls_new", templateVars);
 });
 
 app.get("/u/:id", (req, res) => {
@@ -70,18 +74,72 @@ app.post('/login', (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
+  const user_id = req.cookies.user_id;
+  const user = users[user_id];
+
   const templateVars = {
-    username: req.cookies.username,
+    user,
     urls: urlDatabase
   };
   res.render("urls_index", templateVars);
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie("username");
+  res.clearCookie("user_id");
   res.redirect("/urls");
 });
 
 app.get("/register", (req, res) => {
   res.render("register");
+});
+
+// Store users in the app
+const users = {
+  userRandomID: {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur",
+  },
+  user2RandomID: {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk",
+  },
+};
+
+app.post("/register", (req, res) => {
+  const { email, password } = req.body;
+
+  // Check for empty email or password
+  if (!email || !password) {
+    return res.status(400).send("Email and password cannot be blank.");
+  }
+
+  // Check if email already exists
+  for (const userId in users) {
+    if (users[userId].email === email) {
+      return res.status(400).send("A user with that email already exists.");
+    }
+  }
+
+  // Generate a new user ID
+  const userID = generateRandomString();
+
+  // Create and store new user
+  const newUser = {
+    id: userID,
+    email,
+    password,
+  };
+
+  users[userID] = newUser;
+
+  // Set a cookie with the user's ID
+  res.cookie("user_id", userID);
+
+  // Log users object to verify
+  console.log("Updated users object:", users);
+
+  // Redirect to /urls
+  res.redirect("/urls");
 });
