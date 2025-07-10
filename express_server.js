@@ -76,10 +76,21 @@ app.post('/urls/:id', (req, res) => {
   res.redirect('/urls');
 });
 
-app.post('/login', (req, res) => {
-  const username = req.body.username;
-  res.cookie('username', username);
-  res.redirect('/urls');
+app.post("/login", (req, res) => {
+  const { email, password } = req.body;
+
+  const user = getUserByEmail(email, users);
+
+  if (!user) {
+    return res.status(403).send("No user with that email found.");
+  }
+
+  if (user.password !== password) {
+    return res.status(403).send("Incorrect password.");
+  }
+
+  res.cookie("user_id", user.id);
+  res.redirect("/urls");
 });
 
 app.get("/urls", (req, res) => {
@@ -95,7 +106,7 @@ app.get("/urls", (req, res) => {
 
 app.post("/logout", (req, res) => {
   res.clearCookie("user_id");
-  res.redirect("/urls");
+  res.redirect("/login");
 });
 
 app.get("/register", (req, res) => {
