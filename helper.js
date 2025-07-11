@@ -1,5 +1,3 @@
-// helpers.js
-
 const getUserByEmail = function(email, database) {
   for (const userId in database) {
     if (database[userId].email === email) {
@@ -9,4 +7,14 @@ const getUserByEmail = function(email, database) {
   return null;
 };
 
-module.exports = { getUserByEmail };
+const urlsForUser = function(userId, urlDatabase) {
+  const filteredURLs = {};
+  for (const shortURL in urlDatabase) {
+    if (urlDatabase[shortURL].userId === userId) {
+      filteredURLs[shortURL] = urlDatabase[shortURL];
+    }
+  }
+  return filteredURLs;
+};
+
+module.exports = { getUserByEmail, urlsForUser };
