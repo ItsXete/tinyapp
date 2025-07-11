@@ -3,11 +3,12 @@ const app = express();
 const PORT = 8080;
 const cookieSession = require('cookie-session');
 const bcrypt = require("bcryptjs");
+const { getUserByEmail } = require('./helpers');
 
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieSession({
   name: 'session',
-  keys: ['my-secret-key'],
+  keys: ['key1-secret', 'key2-secret', 'key3-secret'],
   maxAge: 24 * 60 * 60 * 1000
 }));
 
@@ -18,15 +19,6 @@ const urlDatabase = {
     longURL: "http://www.lighthouselabs.ca",
     userID: "userRandomID"
   },
-};
-
-const getUserByEmail = (email, usersDB) => {
-  for (const userId in usersDB) {
-    if (usersDB[userId].email === email) {
-      return usersDB[userId];
-    }
-  }
-  return null;
 };
 
 app.get("/", (req, res) => {
@@ -148,7 +140,7 @@ app.post("/login", (req, res) => {
   }
 
   if (!bcrypt.compareSync(password, user.password)) {
-    return res.status(403).send("Incorrect password.");
+    return res.status(403).render("login", { error: "Incorrect password." });
   }
 
   req.session.user_id = user.id;
@@ -242,7 +234,11 @@ app.post("/urls", (req, res) => {
 
   const shortURL = generateRandomString();
   const longURL = req.body.longURL;
-  urlDatabase[shortURL] = longURL;
+
+  urlDatabase[shortURL] = {
+    longURL: longURL,
+    userID: user_id
+  };
 
   res.redirect(`/urls/${shortURL}`);
 });
