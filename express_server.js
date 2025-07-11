@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const PORT = 8080;
 const cookieParser = require('cookie-parser');
+const bcrypt = require("bcryptjs");
 
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -60,39 +61,89 @@ function generateRandomString() {
 }
 
 app.get("/urls/:id", (req, res) => {
-  const id = req.params.id;
-  const longURL = urlDatabase[id];
-  const templateVars = { id, longURL };
+  const user_id = req.cookies.user_id;
+  const user = users[user_id];
+  
+  if (!user) {
+    return res.status(401).send('<html><body><h1>Please log in to view this URL</h1></body></html>');
+  }
+  
+  const urlData = urlDatabase[req.params.id];
+
+  if (!urlData) {
+    return res.status(404).send('<html><body><h1>This URL does not exist</h1></body></html>');
+  }
+
+  if (urlData.userID !== user_id) {
+    return res.status(403).send('<html><body><h1>You do not have permission to view this URL</h1></body></html>');
+  }
+
+  const templateVars = {
+    id: req.params.id,
+    longURL: urlData.longURL,
+    user,
+  };
+
   res.render("urls_show", templateVars);
 });
 
 app.post('/urls/:id/delete', (req, res) => {
+  const user_id = req.cookies.user_id;
   const id = req.params.id;
-  delete urlDatabase[id];
-  res.redirect('/urls'); 
-});
 
-app.post('/urls/:id', (req, res) => {
-  const id = req.params.id;
-  const newLongURL = req.body.longURL;
+  const urlEntry = urlDatabase[id];
 
-  if (urlDatabase[id]) {
-    urlDatabase[id] = newLongURL;
+  if (!urlEntry) {
+    return res.status(404).send("<html><body><h2>URL not found.</h2></body></html>");
   }
+
+  if (!user_id) {
+    return res.status(401).send("<html><body><h2>Please log in to delete URLs.</h2></body></html>");
+  }
+
+  if (urlEntry.userID !== user_id) {
+    return res.status(403).send("<html><body><h2>You do not have permission to delete this URL.</h2></body></html>");
+  }
+
+  delete urlDatabase[id];
 
   res.redirect('/urls');
 });
 
+app.post('/urls/:id', (req, res) => {
+  const user_id = req.cookies.user_id;
+  const id = req.params.id;
+  const newLongURL = req.body.longURL;
+
+  const urlEntry = urlDatabase[id];
+
+  if (!urlEntry) {
+    return res.status(404).send("<html><body><h2>URL not found.</h2></body></html>");
+  }
+
+  if (!user_id) {
+    return res.status(401).send("<html><body><h2>Please log in to edit URLs.</h2></body></html>");
+  }
+
+  if (urlEntry.userID !== user_id) {
+    return res.status(403).send("<html><body><h2>You do not have permission to edit this URL.</h2></body></html>");
+  }
+
+  urlDatabase[id].longURL = newLongURL;
+
+  res.redirect('/urls');
+});
+
+
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
-
   const user = getUserByEmail(email, users);
 
   if (!user) {
     return res.status(403).send("No user with that email found.");
   }
 
-  if (user.password !== password) {
+  if (!bcrypt.compareSync(password, user.password)) {
     return res.status(403).send("Incorrect password.");
   }
 
@@ -104,10 +155,17 @@ app.get("/urls", (req, res) => {
   const user_id = req.cookies.user_id;
   const user = users[user_id];
 
+  if (!user) {
+    return res.status(401).send("<html><body><h2>Please log in or register to view URLs.</h2></body></html>");
+  }
+
+  const userURLs = urlsForUser(user_id);
+
   const templateVars = {
     user,
-    urls: urlDatabase
+    urls: userURLs
   };
+
   res.render("urls_index", templateVars);
 });
 
@@ -143,36 +201,26 @@ const users = {
 app.post("/register", (req, res) => {
   const { email, password } = req.body;
 
-  // Check for empty email or password
   if (!email || !password) {
     return res.status(400).send("Email and password cannot be blank.");
   }
 
-  // Use helper to check if email already exists
   const existingUser = getUserByEmail(email, users);
   if (existingUser) {
     return res.status(400).send("A user with that email already exists.");
   }
 
-  // Generate a new user ID
   const userID = generateRandomString();
+  const hashedPassword = bcrypt.hashSync(password, 10);
 
-  // Create and store new user
   const newUser = {
     id: userID,
     email,
-    password,
+    password: hashedPassword,
   };
 
   users[userID] = newUser;
-
-  // Set a cookie with the user's ID
   res.cookie("user_id", userID);
-
-  // Debug log
-  console.log("Updated users object:", users);
-
-  // Redirect to /urls
   res.redirect("/urls");
 });
 
@@ -194,3 +242,13 @@ app.post("/urls", (req, res) => {
 
   res.redirect(`/urls/${shortURL}`);
 });
+
+const urlsForUser = (id) => {
+  const filteredURLs = {};
+  for (const shortURL in urlDatabase) {
+    if (urlDatabase[shortURL].userID === id) {
+      filteredURLs[shortURL] = urlDatabase[shortURL];
+    }
+  }
+  return filteredURLs;
+};
