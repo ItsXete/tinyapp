@@ -1,3 +1,4 @@
+// helpers.js
 const getUserByEmail = function(email, database) {
   for (const userId in database) {
     if (database[userId].email === email) {
@@ -10,11 +11,15 @@ const getUserByEmail = function(email, database) {
 const urlsForUser = function(userId, urlDatabase) {
   const filteredURLs = {};
   for (const shortURL in urlDatabase) {
-    if (urlDatabase[shortURL].userId === userId) {
+    if (urlDatabase[shortURL].userID === userId) {
       filteredURLs[shortURL] = urlDatabase[shortURL];
     }
   }
   return filteredURLs;
 };
 
-module.exports = { getUserByEmail, urlsForUser };
+const generateRandomString = function() {
+  return Math.random().toString(36).substring(2, 8);
+};
+
+module.exports = { getUserByEmail, urlsForUser, generateRandomString };

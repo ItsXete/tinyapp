@@ -1,9 +1,10 @@
+// express_server.js
 const express = require("express");
 const app = express();
 const PORT = 8080;
 const cookieSession = require('cookie-session');
 const bcrypt = require("bcryptjs");
-const { getUserByEmail } = require('./helpers');
+const { getUserByEmail, urlsForUser, generateRandomString } = require('./helpers');
 
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieSession({
@@ -51,10 +52,6 @@ app.get("/u/:id", (req, res) => {
   const longURL = urlDatabase[shortURL];
   res.redirect(longURL);
 });
-
-function generateRandomString() {
-  return Math.random().toString(36).substring(2, 8);
-}
 
 app.get("/urls/:id", (req, res) => {
   const user_id = req.session.user_id;
@@ -155,7 +152,7 @@ app.get("/urls", (req, res) => {
     return res.status(401).send("<html><body><h2>Please log in or register to view URLs.</h2></body></html>");
   }
 
-  const userURLs = urlsForUser(user_id);
+  const userURLs = urlsForUser(user_id, urlDatabase);
 
   const templateVars = {
     user,
@@ -201,11 +198,6 @@ app.post("/register", (req, res) => {
     return res.status(400).send("Email and password cannot be blank.");
   }
 
-  const existingUser = getUserByEmail(email, users);
-  if (existingUser) {
-    return res.status(400).send("A user with that email already exists.");
-  }
-
   const userID = generateRandomString();
   const hashedPassword = bcrypt.hashSync(password, 10);
 
@@ -242,13 +234,3 @@ app.post("/urls", (req, res) => {
 
   res.redirect(`/urls/${shortURL}`);
 });
-
-const urlsForUser = (id) => {
-  const filteredURLs = {};
-  for (const shortURL in urlDatabase) {
-    if (urlDatabase[shortURL].userID === id) {
-      filteredURLs[shortURL] = urlDatabase[shortURL];
-    }
-  }
-  return filteredURLs;
-};
