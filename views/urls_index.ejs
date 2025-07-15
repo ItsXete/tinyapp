@@ -1,34 +1,77 @@
-<header>
-  <nav class="navbar navbar-expand-md navbar-dark bg-success">
-    <a class="navbar-brand" href="/urls">TinyApp</a>
-    <button
-      class="navbar-toggler"
-      type="button"
-      data-toggle="collapse"
-      data-target="#navbarNavAltMarkup"
-      aria-controls="navbarNavAltMarkup"
-      aria-expanded="false"
-      aria-label="Toggle navigation"
-    >
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-      <div class="navbar-nav mr-auto">
-        <a class="nav-item nav-link" href="/urls">My URLs</a>
-        <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
-      </div>
+<%- include('partials/_header', { user: user }) %>
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Your URLs</title>
+    <style>
+      html, body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background-color: #f8f8f8;
+      }
+      .container-box {
+        background: white;
+        padding: 40px;
+        margin: 40px auto;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        width: 90%;
+        max-width: 800px;
+      }
+      h1 {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      p {
+        text-align: center;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th, td {
+        padding: 12px;
+        border-bottom: 1px solid #ddd;
+        text-align: left;
+      }
+      th {
+        background-color: #f0f0f0;
+      }
+      a {
+        color: #007bff;
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container-box">
+      <h1>Your URLs</h1>
 
-      <% if (username) { %>
-        <span class="navbar-text text-white mr-3">Logged in as: <%= username %></span>
-        <form method="POST" action="/logout" class="form-inline" style="display:inline;">
-          <button class="btn btn-light" type="submit">Logout</button>
-        </form>
+      <% if (Object.keys(urls).length === 0) { %>
+        <p>You don't have any URLs yet. <a href="/urls/new">Create one here</a>.</p>
       <% } else { %>
-        <form method="POST" action="/login" class="form-inline">
-          <input class="form-control mr-2" type="text" name="username" placeholder="Username" required>
-          <button class="btn btn-light" type="submit">Login</button>
-        </form>
+        <table>
+          <thead>
+            <tr>
+              <th>Short URL</th>
+              <th>Long URL</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% for (const shortURL in urls) { %>
+              <tr>
+                <td><%= shortURL %></td>
+                <td><a href="<%= urls[shortURL].longURL %>" target="_blank"><%= urls[shortURL].longURL %></a></td>
+                <td><a href="/urls/<%= shortURL %>">Edit</a></td>
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
       <% } %>
     </div>
-  </nav>
-</header>
+  </body>
+</html>

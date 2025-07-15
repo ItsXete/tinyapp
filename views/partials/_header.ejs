@@ -1,9 +1,13 @@
-<% if (user) { %>
-  <span class="navbar-text text-white mr-3">Logged in as: <%= user.email %></span>
-  <form method="POST" action="/logout" class="form-inline" style="display:inline;">
-    <button class="btn btn-light" type="submit">Logout</button>
-  </form>
-<% } else { %>
-  <a class="btn btn-light mr-2" href="/login">Login</a>
-  <a class="btn btn-light" href="/register">Register</a>
-<% } %>
+<header>
+  <nav style="display: flex; align-items: center; padding: 1rem; background: #9c9c9c;">
+    <div style="display: flex; gap: 1rem;">
+      <span>Logged in as <strong>dewad@ead.cd</strong></span>
+      <a href="/urls">My URLs</a>
+      <a href="/urls/new">Create New URL</a>
+    </div>
+
+    <form method="POST" action="/logout" style="display:inline; margin-left: auto;">
+      <button type="submit" style="cursor: pointer;">Logout</button>
+    </form>
+  </nav>
+</header>

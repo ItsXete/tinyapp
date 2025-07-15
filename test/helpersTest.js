@@ -3,15 +3,15 @@ const { urlsForUser } = require('../helpers.js'); // Adjust path if needed
 
 describe('urlsForUser', function() {
   const urlDatabase = {
-    "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userId: "user1" },
-    "9sm5xK": { longURL: "http://www.google.com", userId: "user2" },
-    "a1b2c3": { longURL: "http://www.example.com", userId: "user1" }
+    "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "user1" },
+    "9sm5xK": { longURL: "http://www.google.com", userID: "user2" },
+    "a1b2c3": { longURL: "http://www.example.com", userID: "user1" }
   };
 
   it('should return urls that belong to the specified user', function() {
     const expectedOutput = {
-      "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userId: "user1" },
-      "a1b2c3": { longURL: "http://www.example.com", userId: "user1" }
+      "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "user1" },
+      "a1b2c3": { longURL: "http://www.example.com", userID: "user1" }
     };
     const result = urlsForUser('user1', urlDatabase);
     assert.deepEqual(result, expectedOutput);
@@ -31,7 +31,7 @@ describe('urlsForUser', function() {
   it('should not return urls belonging to other users', function() {
     const result = urlsForUser('user2', urlDatabase);
     const expectedOutput = {
-      "9sm5xK": { longURL: "http://www.google.com", userId: "user2" }
+      "9sm5xK": { longURL: "http://www.google.com", userID: "user2" }
     };
     assert.deepEqual(result, expectedOutput);
   });
