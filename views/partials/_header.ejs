@@ -1,13 +1,22 @@
 <header>
   <nav style="display: flex; align-items: center; padding: 1rem; background: #9c9c9c;">
     <div style="display: flex; gap: 1rem;">
-      <span>Logged in as <strong>dewad@ead.cd</strong></span>
-      <a href="/urls">My URLs</a>
-      <a href="/urls/new">Create New URL</a>
+      <% if (user) { %>
+        <span>Logged in as <strong><%= user.email %></strong></span>
+        <a href="/urls">My URLs</a>
+        <a href="/urls/new">Create New URL</a>
+      <% } %>
     </div>
 
-    <form method="POST" action="/logout" style="display:inline; margin-left: auto;">
-      <button type="submit" style="cursor: pointer;">Logout</button>
-    </form>
+    <div style="margin-left: auto;">
+      <% if (user) { %>
+        <form method="POST" action="/logout" style="display:inline;">
+          <button type="submit" style="cursor: pointer;">Logout</button>
+        </form>
+      <% } else { %>
+        <a href="/login">Login</a>
+        <a href="/register">Register</a>
+      <% } %>
+    </div>
   </nav>
 </header>

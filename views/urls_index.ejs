@@ -62,14 +62,24 @@
             </tr>
           </thead>
           <tbody>
-            <% for (const shortURL in urls) { %>
-              <tr>
-                <td><%= shortURL %></td>
-                <td><a href="<%= urls[shortURL].longURL %>" target="_blank"><%= urls[shortURL].longURL %></a></td>
-                <td><a href="/urls/<%= shortURL %>">Edit</a></td>
-              </tr>
-            <% } %>
-          </tbody>
+  <% for (const shortURL in urls) { %>
+    <tr>
+      <td><%= shortURL %></td>
+      <td><a href="<%= urls[shortURL].longURL %>" target="_blank"><%= urls[shortURL].longURL %></a></td>
+      <td>
+        <a href="/urls/<%= shortURL %>">Edit</a>
+
+        <!-- Delete form buttn -->
+        <form method="POST" action="/urls/<%= shortURL %>/delete" style="display: inline;">
+          <button type="submit" style="cursor: pointer; background-color: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 3px;">
+            Delete
+          </button>
+        </form>
+      </td>
+    </tr>
+  <% } %>
+</tbody>
+
         </table>
       <% } %>
     </div>

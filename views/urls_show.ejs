@@ -1,29 +1,23 @@
+<%- include('partials/_header', { user: user }) %>
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Edit URL</title>
+  <!-- your styles here -->
+</head>
 <body>
-  <header>
-    <nav style="display: flex; align-items: center; padding: 1rem; background: #9c9c9c;">
-      <div style="display: flex; gap: 1rem;">
-        <span>Logged in as <strong>dewad@ead.cd</strong></span>
-        <a href="/urls">My URLs</a>
-        <a href="/urls/new">Create New URL</a>
-      </div>
-
-      <form method="POST" action="/logout" style="display:inline; margin-left: auto;">
-        <button type="submit" style="cursor: pointer;">Logout</button>
-      </form>
-    </nav>
-  </header>
-
   <main class="container-box">
     <h1>Edit URL</h1>
-    <p style="text-align: center;">TinyURL for: <strong>dawdawd</strong></p>
-    <p style="text-align: center;">Short URL ID: <a href="/u/smg46s">smg46s</a></p>
+    <p style="text-align: center;">TinyURL for: <strong><%= longURL %></strong></p>
+    <p style="text-align: center;">Short URL ID: <a href="/u/<%= id %>"><%= id %></a></p>
 
-    <form action="/urls/smg46s" method="POST" style="text-align: center;">
+    <form action="/urls/<%= id %>" method="POST" style="text-align: center;">
       <input
         type="text"
         id="longURL"
         name="longURL"
-        value="dawdawd"
+        value="<%= longURL %>"
         placeholder="http://"
         class="form-control"
         style="width: 300px; display: inline-block; margin-bottom: 20px;"
@@ -37,37 +31,7 @@
   </main>
 
   <style>
-    html, body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #f8f8f8;
-    }
-    .container-box {
-      background: white;
-      padding: 40px;
-      margin: 40px auto;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      width: 90%;
-      max-width: 800px;
-    }
-    h1 {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    input.form-control {
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-    button.btn-primary {
-      cursor: pointer;
-      background-color: #007bff;
-      border: none;
-      border-radius: 4px;
-      color: white;
-    }
-    button.btn-primary:hover {
-      background-color: #0056b3;
-    }
+    /* your existing styles here */
   </style>
 </body>
+</html>
